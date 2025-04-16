@@ -1,5 +1,6 @@
 import requests
 import os
+import pandas as pd
 
 
 def download_images(csv_path, save_dir):
