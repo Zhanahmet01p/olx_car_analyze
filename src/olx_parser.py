@@ -36,14 +36,15 @@ def parse_car_page(url):
 
         # Характеристики
         details = {}
-        details_container = soup.find("div", data_testid="ad-parameters-container")
+        details_container = soup.find("div", {"data-testid": "ad-parameters-container"})
         if details_container:
             for item in details_container.find_all("p", class_="css-1los5bp"):
                 text = item.text.strip()
                 if ":" in text:
                     key, value = map(str.strip, text.split(":", 1))
                     details[key] = value
-                elif " " in text: # Дополнительная обработка, если нет двоеточия
+                else:
+                    # Попробуем разделить по первому пробелу, если нет двоеточия
                     parts = text.split(" ", 1)
                     if len(parts) == 2:
                         key, value = map(str.strip, parts)
@@ -57,7 +58,7 @@ def parse_car_page(url):
             "title": title,
             "price_pln": price,
             "brand": details.get("Marka pojazdu", ""),
-            "model": details.get("Model:", details.get("Model pojazdu", "")).split(" ")[0] if details.get("Model:", details.get("Model pojazdu", "")) else "", # Обработка "Model: CC"
+            "model": details.get("Model", "").split(" ")[-1] if details.get("Model") else details.get("Model pojazdu", "").split(" ")[-1] if details.get("Model pojazdu") else "",
             "year": details.get("Rok produkcji", ""),
             "mileage_km": details.get("Przebieg", "").replace(" km", "").replace(" ", ""),
             "fuel": details.get("Paliwo", ""),
@@ -70,7 +71,6 @@ def parse_car_page(url):
     except Exception as e:
         print(f"Ошибка при парсинге {url}: {e}")
         return None
-
 
 def scrape_olx_pages(num_pages=3):
     """Парсинг списка объявлений"""
