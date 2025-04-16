@@ -1,0 +1,13 @@
+beautifulsoup4
+requests
+pandas
+numpy
+scikit-learn
+plotly
+umap-learn
+sentence-transformers
+torch
+torchvision
+transformers
+opencv-python
+tqdm
