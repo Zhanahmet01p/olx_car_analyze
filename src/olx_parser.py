@@ -105,4 +105,4 @@ def scrape_olx_pages(num_pages=3):
 
 
 if __name__ == "__main__":
-    scrape_olx_pages(num_pages=1)  # Парсим 3 страницы для теста
+    scrape_olx_pages(num_pages=3)  # Парсим 3 страницы для теста
