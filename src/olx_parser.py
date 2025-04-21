@@ -10,7 +10,6 @@ import urllib3
 urllib3.disable_warnings()
 
 
-# Настройки
 BASE_URL = "https://www.olx.pl/motoryzacja/samochody/"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -20,13 +19,11 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 
 
 def parse_car_page(url):
-    """Парсинг одного объявления"""
     try:
         response = requests.get(url, headers=HEADERS)
-        response.raise_for_status()  # Проверка на ошибки HTTP
+        response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Основные данные
         title_element = soup.find("h4", class_="css-10ofhqw")
         title = title_element.text.strip() if title_element else ""
 
@@ -44,13 +41,11 @@ def parse_car_page(url):
                     key, value = map(str.strip, text.split(":", 1))
                     details[key] = value
                 else:
-                    # Попробуем разделить по первому пробелу, если нет двоеточия
                     parts = text.split(" ", 1)
                     if len(parts) == 2:
                         key, value = map(str.strip, parts)
                         details[key] = value
 
-        # Изображения (первое изображение)
         img_element = soup.find("img", class_="css-1bmvjcs")
         img_url = img_element["src"] if img_element and "src" in img_element.attrs else None
 
@@ -73,18 +68,18 @@ def parse_car_page(url):
         return None
 
 def scrape_olx_pages(num_pages=3):
-    """Парсинг списка объявлений"""
+
     cars_data = []
 
     for page in range(1, num_pages + 1):
         print(f"Парсинг страницы {page}...")
         url = f"{BASE_URL}?page={page}"
         response = requests.get(url, headers=HEADERS)
-        response.raise_for_status()  # Проверка на ошибки HTTP
+        response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
         # Ссылки на объявления
-        links = [a["href"] for a in soup.find_all("a", class_="css-1tqlkj0")] # Обновленный селектор для ссылок
+        links = [a["href"] for a in soup.find_all("a", class_="css-1tqlkj0")]
         print(f"Найдено {len(links)} ссылок на странице {page}")
 
         for link in links:
@@ -94,7 +89,7 @@ def scrape_olx_pages(num_pages=3):
             car_data = parse_car_page(link)
             if car_data:
                 cars_data.append(car_data)
-            sleep(random.uniform(1, 3))  # Задержка для избежания бана
+            sleep(random.uniform(1, 3))
 
     # Сохраняем в CSV
     print(f"Количество собранных объявлений: {len(cars_data)}")
@@ -105,4 +100,4 @@ def scrape_olx_pages(num_pages=3):
 
 
 if __name__ == "__main__":
-    scrape_olx_pages(num_pages=3)  # Парсим 3 страницы для теста
+    scrape_olx_pages(num_pages=4)
