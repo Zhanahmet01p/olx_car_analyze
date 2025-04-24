@@ -5,9 +5,6 @@ from urllib.parse import urlparse
 
 
 def download_images(csv_path, save_dir):
-    """Downloads images from URLs in a CSV file"""
-
-    # Read the CSV file
     df = pd.read_csv(csv_path)
     os.makedirs(save_dir, exist_ok=True)
 
@@ -51,7 +48,6 @@ def download_images(csv_path, save_dir):
 
 
 def is_valid_url(url):
-    """Utility function to check if a URL is valid."""
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
@@ -59,7 +55,6 @@ def is_valid_url(url):
         return False
 
 
-# Usage:
 download_images(
     csv_path="../data/raw/olx_cars.csv",
     save_dir="../data/raw/images"

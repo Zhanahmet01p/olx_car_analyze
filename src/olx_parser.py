@@ -31,7 +31,7 @@ def parse_car_page(url):
         price_text = price_element.text.strip() if price_element else ""
         price = price_text.replace(" ", "").replace("zł", "").split("do")[0].strip()
 
-        # Характеристики
+
         details = {}
         details_container = soup.find("div", {"data-testid": "ad-parameters-container"})
         if details_container:
@@ -61,10 +61,10 @@ def parse_car_page(url):
             "image_url": img_url
         }
     except requests.exceptions.RequestException as e:
-        print(f"Ошибка при запросе {url}: {e}")
+        print(f"Error{url}: {e}")
         return None
     except Exception as e:
-        print(f"Ошибка при парсинге {url}: {e}")
+        print(f"Error in Scraping {url}: {e}")
         return None
 
 def scrape_olx_pages(num_pages=3):
@@ -72,30 +72,30 @@ def scrape_olx_pages(num_pages=3):
     cars_data = []
 
     for page in range(1, num_pages + 1):
-        print(f"Парсинг страницы {page}...")
+        print(f"Scraping {page}...")
         url = f"{BASE_URL}?page={page}"
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Ссылки на объявления
+
         links = [a["href"] for a in soup.find_all("a", class_="css-1tqlkj0")]
-        print(f"Найдено {len(links)} ссылок на странице {page}")
+        print(f"Finded {len(links)} links to  {page}")
 
         for link in links:
             if not link.startswith("https://www.olx.pl"):
                 link = f"https://www.olx.pl{link}"
-            print(f"Обработка ссылки: {link}")
+            print(f"Links done: {link}")
             car_data = parse_car_page(link)
             if car_data:
                 cars_data.append(car_data)
             sleep(random.uniform(1, 3))
 
-    # Сохраняем в CSV
-    print(f"Количество собранных объявлений: {len(cars_data)}")
+
+    print(f"Count of data : {len(cars_data)}")
     df = pd.DataFrame(cars_data)
     df.to_csv(f"{SAVE_DIR}olx_cars.csv", index=False)
-    print(f"Данные сохранены в {SAVE_DIR}olx_cars.csv")
+    print(f"Save on {SAVE_DIR}olx_cars.csv")
     return df
 
 
